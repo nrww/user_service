@@ -1,8 +1,8 @@
 openapi: '3.0.0'
 info:
   version: '1.0.0'
-  title: 'Arch Lab Example API'
-  description: Пример API для первого домашнего задания по курсу Архитектура программных систем
+  title: 'User API'
+  description: API для управления пользователями
 servers:
   - url: http://localhost:8081
     description: Example server
@@ -24,7 +24,7 @@ paths:
         schema:
           type: string
       responses:
-        '200':
+        200:
           description: The users for the provided masks
           content:
             application/json:
@@ -42,22 +42,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /auth:
-    get:
-      summary: Проверка аутентификации
-      responses:
-        '200':
-          description: User ID
-          content:
-            application/json:
-              schema:
-               type: string
-        401:
-          description: Not authentication
-          content:
-            application/json:
-              schema:
-                type: string
   /user:
     get:
       summary: Чтение информации о пользователе
@@ -69,7 +53,7 @@ paths:
         schema:
           $ref: '#/components/schemas/user_id'
       responses:
-        '200':
+        200:
           description: Найденный пользователь
           content:
             application/json:
@@ -127,7 +111,7 @@ paths:
         schema:
           type: string
       responses:
-        '200':
+        200:
           description: Идентификатор, добавленного пользователя
           content:
             application/json:
