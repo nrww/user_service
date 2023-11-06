@@ -37,17 +37,13 @@ namespace database
                         << "PRIMARY KEY (`user_id`),KEY `fn` (`first_name`),KEY `ln` (`last_name`));",
                 now;
         }
-
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "connection:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-
-            std::cout << "statement:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
     }
 
@@ -102,18 +98,17 @@ namespace database
             Poco::Data::RecordSet rs(select);
             if (rs.moveFirst()) return id;
         }
-
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "connection:" << e.what() << std::endl;
+            std::cout << e.displayText() << std::endl;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-
-            std::cout << "statement:" << e.what() << std::endl;
+            std::cout << e.displayText() << std::endl;
         }
         return {};
     }
+
     std::optional<User> User::read_by_id(long id)
     {
         try
@@ -138,16 +133,13 @@ namespace database
             Poco::Data::RecordSet rs(select);
             if (rs.moveFirst()) return a;
         }
-
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "connection:" << e.what() << std::endl;
+            std::cout << e.displayText() << std::endl;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-
-            std::cout << "statement:" << e.what() << std::endl;
-            
+            std::cout << e.displayText() << std::endl;
         }
         return {};
     }
@@ -178,18 +170,15 @@ namespace database
             }
             return result;
         }
-
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "connection:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-
-            std::cout << "statement:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
+        return std::vector<User>();
     }
 
     std::vector<User> User::search(std::string first_name, std::string last_name)
@@ -226,20 +215,17 @@ namespace database
 
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "connection:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-
-            std::cout << "statement:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
+        return std::vector<User>();
     }
 
-    void User::save_to_mysql()
+    bool User::save_to_mysql()
     {
-
         try
         {
             Poco::Data::Session session = database::Database::get().create_session();
@@ -266,18 +252,17 @@ namespace database
                 select.execute();
             }
             std::cout << "inserted:" << _id << std::endl;
+            return true;
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
         {
-            std::cout << "connection:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
         catch (Poco::Data::MySQL::StatementException &e)
         {
-
-            std::cout << "statement:" << e.what() << std::endl;
-            throw;
+            std::cout << e.displayText() << std::endl;
         }
+        return false;
     }
 
     const std::string &User::get_login() const
@@ -300,7 +285,7 @@ namespace database
         return _password;
     }
 
-    long User::get_id() const
+    const long &User::get_id() const
     {
         return _id;
     }

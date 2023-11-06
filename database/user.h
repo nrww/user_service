@@ -22,7 +22,7 @@ namespace database
 
             static User fromJSON(const std::string & str);
 
-            long             get_id() const;
+            const long        &get_id() const;
             const std::string &get_first_name() const;
             const std::string &get_last_name() const;
             const std::string &get_email() const;
@@ -43,7 +43,7 @@ namespace database
             static std::optional<long> auth(std::string &login, std::string &password);
             static std::vector<User> read_all();
             static std::vector<User> search(std::string first_name,std::string last_name);
-            void save_to_mysql();
+            bool save_to_mysql();
 
             Poco::JSON::Object::Ptr toJSON() const;
 

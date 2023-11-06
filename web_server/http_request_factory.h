@@ -53,11 +53,15 @@ public:
         const HTTPServerRequest& request)
     {
 
-        std::cout << "request:" << request.getURI()<< std::endl;
+        
         if (hasSubstr(request.getURI(),"/user") ||
-            hasSubstr(request.getURI(),"/search") ||
-            hasSubstr(request.getURI(),"/auth")) 
-            return new UserHandler(_format);
+            hasSubstr(request.getURI(),"/search"))// ||
+            //hasSubstr(request.getURI(),"/auth")) 
+            {
+                std::cout << request.getMethod() << " request:" << request.getURI() << std::endl;
+                return new UserHandler(_format);
+            }
+            
         return 0;
     }
 
