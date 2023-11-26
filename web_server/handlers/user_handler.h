@@ -218,9 +218,11 @@ public:
             } */
             else if (hasSubstr(request.getURI(), "/search"))
             {
+                std::string fn = "";
+                std::string ln = "";
+                if(form.has("first_name"))  fn = form.get("first_name");
+                if(form.has("last_name"))  ln = form.get("last_name");
 
-                std::string fn = form.get("first_name");
-                std::string ln = form.get("last_name");
                 auto results = database::User::search(fn, ln);
                 if(!results.empty())
                 {
@@ -309,8 +311,9 @@ public:
                 }
             }
         }
-        catch (...)
+        catch (const Poco::Exception& e)
         {
+            std::cout<<e.displayText()<<std::endl;
         }
 
         notFoundError(response, request.getURI(), "Request ot found");
