@@ -289,7 +289,7 @@ public:
                             response.setChunkedTransferEncoding(true);
                             response.setContentType("application/json");
                             Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-                            root->set("inserted", user.get_id());
+                            root->set("inserted_id", user.get_id());
                             std::ostream &ostr = response.send();
                             Poco::JSON::Stringifier::stringify(root, ostr);
                             
