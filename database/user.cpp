@@ -339,12 +339,12 @@ namespace database
         {
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement insert(session);
-            long user_id = this->get_last_id();
-            auto hint = Database::sharding_user(user_id);
+            _id = this->get_last_id();
+            auto hint = Database::sharding_user(_id);
             insert  << "INSERT INTO `user` (`user_id`, `first_name`, `last_name`, `email`, `phone`, `login`, `password`)"
                     << "VALUES(?, ?, ?, ?, ?, ?, ?)"
                     << hint,
-                use(user_id),
+                use(_id),
                 use(_first_name),
                 use(_last_name),
                 use(_email),
@@ -354,7 +354,7 @@ namespace database
 
             insert.execute();
 
-            std::cout << "inserted:" << user_id << std::endl;
+            std::cout << "inserted:" << _id << std::endl;
             return true;
         }
         catch (Poco::Data::MySQL::ConnectionException &e)
