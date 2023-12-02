@@ -1,6 +1,7 @@
 #include "user.h"
 #include "database.h"
 #include "../config/config.h"
+#include "../database/cache.h"
 
 #include <Poco/Data/MySQL/Connector.h>
 #include <Poco/Data/MySQL/MySQLException.h>
@@ -71,6 +72,31 @@ namespace database
         {
             std::cout << e.displayText() << std::endl;
         }
+    }
+
+    std::optional<User> User::read_from_cache_by_id(long id)
+    {
+        try
+        {
+            std::string result;
+            if (Cache::get().get(id, result))
+                return fromJSON(result);
+            else
+                return {};
+        }
+        catch (std::exception& err)
+        {
+            std::cerr <<"error: " << err.what() << std::endl;
+            return {};
+        }
+    }
+
+    void User::save_to_cache()
+    {
+        std::stringstream ss;
+        Poco::JSON::Stringifier::stringify(toJSON(), ss);
+        std::string message = ss.str();
+        Cache::get().put(_id, message);
     }
 
     Poco::JSON::Object::Ptr User::toJSON() const
@@ -159,25 +185,33 @@ namespace database
 
     }
 
-    std::optional<User> User::read_by_id(long id)
+    std::optional<User> User::read_by_id(long id, bool no_cache /*=false*/)
     {
         try
         {
+            std::optional<database::User> a;
+
+            if(!no_cache )
+            {
+                a = read_from_cache_by_id(id);
+                if(a.has_value()) return a.value();
+                
+            }
+            User rez;
             Poco::Data::Session session = database::Database::get().create_session();
             Poco::Data::Statement select(session);
-            User a;
             auto hint = Database::sharding_user(id);
             select  << "SELECT `user_id`, `first_name`, `last_name`, `email`, `phone`, `login`, `password`" 
                     << "FROM `user`" 
                     << "WHERE `user_id`=? " 
                     << hint,
-                into(a._id),
-                into(a._first_name),
-                into(a._last_name),
-                into(a._email),
-                into(a._phone),
-                into(a._login),
-                into(a._password),
+                into(rez._id),
+                into(rez._first_name),
+                into(rez._last_name),
+                into(rez._email),
+                into(rez._phone),
+                into(rez._login),
+                into(rez._password),
                 use(id),
                 range(0, 1); //  iterate over result set one row at a time
 
@@ -185,7 +219,11 @@ namespace database
 
             Poco::Data::RecordSet rs(select);
 
-            if (rs.moveFirst()) return a;
+            if (rs.moveFirst()) 
+            {
+                if(!no_cache) rez.save_to_cache();
+                return rez;
+            }
 
         }
         catch (Poco::Data::MySQL::ConnectionException &e)

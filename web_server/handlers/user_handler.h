@@ -164,7 +164,10 @@ public:
                 std::string id_str = form.get("id");
                 long id = atol(id_str.c_str());
 
-                std::optional<database::User> result = database::User::read_by_id(id);
+                bool no_cache = false;
+                if (form.has("no_cache")) no_cache = true;
+
+                std::optional<database::User> result = database::User::read_by_id(id, no_cache);
                 if (result)
                 {
                     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
@@ -176,7 +179,7 @@ public:
                 }
                 else
                 {
-                    notFoundError(response, request.getURI(), "User id " + id_str + "not found");
+                    notFoundError(response, request.getURI(), "User id " + id_str + " not found");
                     return;
                 }
             }
@@ -285,6 +288,7 @@ public:
                     {
                         if(user.save_to_mysql())
                         {
+                            user.save_to_cache();
                             response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
                             response.setChunkedTransferEncoding(true);
                             response.setContentType("application/json");
