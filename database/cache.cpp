@@ -38,7 +38,6 @@ namespace database
     {
         std::lock_guard<std::mutex> lck(_mtx);
         rediscpp::value response = rediscpp::execute(*_stream, "get", std::to_string(id));
-
         if (response.is_error_message())
             return false;
         if (response.empty())

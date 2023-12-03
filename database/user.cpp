@@ -80,13 +80,15 @@ namespace database
         {
             std::string result;
             if (Cache::get().get(id, result))
+            {
                 return fromJSON(result);
+            }
             else
                 return {};
         }
         catch (std::exception& err)
         {
-            std::cerr <<"error: " << err.what() << std::endl;
+            //std::cerr <<"error: " << err.what() << std::endl;
             return {};
         }
     }
@@ -121,7 +123,7 @@ namespace database
         Poco::Dynamic::Var result = parser.parse(str);
         Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
 
-        user.id() = object->getValue<long>("id");
+        user.id() = object->getValue<long>("user_id");
         user.first_name() = object->getValue<std::string>("first_name");
         user.last_name() = object->getValue<std::string>("last_name");
         user.email() = object->getValue<std::string>("email");
@@ -191,7 +193,7 @@ namespace database
         {
             std::optional<database::User> a;
 
-            if(!no_cache )
+            if(!no_cache)
             {
                 a = read_from_cache_by_id(id);
                 if(a.has_value()) return a.value();
