@@ -7,7 +7,7 @@ SET (EXAMPLE_BINARY "user_service")
 set (STD_CXX "c++17")
 set (REDISCPP_FLAGS "-DREDISCPP_HEADER_ONLY=ON")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -std=${STD_CXX} ${REDISCPP_FLAGS}")
-#set (CMAKE_CXX_FLAGS_RELEASE "-O3 -g0 -std=${STD_CXX} -Wall -DNDEBUG ${REDISCPP_FLAGS}")
+set (CMAKE_CXX_FLAGS_RELEASE "-O3 -g0 -std=${STD_CXX} -Wall -DNDEBUG ${REDISCPP_FLAGS}")
 
 find_package(OpenSSL)
 find_package(Threads)
