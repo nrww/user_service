@@ -42,28 +42,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /all_users:
-    get:
-      summary: Данные всех пользователей
-      responses:
-        200:
-          description: Список всех пользователей
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/users'
-        404:
-          description: Пользователи не найдены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /user:
     get:
       summary: Чтение информации о пользователе
