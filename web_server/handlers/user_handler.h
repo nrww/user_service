@@ -164,7 +164,10 @@ public:
                 std::string id_str = form.get("id");
                 long id = atol(id_str.c_str());
 
-                std::optional<database::User> result = database::User::read_by_id(id);
+                bool no_cache = false;
+                if (form.has("no_cache")) no_cache = true;
+
+                std::optional<database::User> result = database::User::read_by_id(id, no_cache);
                 if (result)
                 {
                     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
@@ -176,7 +179,7 @@ public:
                 }
                 else
                 {
-                    notFoundError(response, request.getURI(), "User id " + id_str + "not found");
+                    notFoundError(response, request.getURI(), "User id " + id_str + " not found");
                     return;
                 }
             }
@@ -218,10 +221,36 @@ public:
             } */
             else if (hasSubstr(request.getURI(), "/search"))
             {
+                std::string fn = "";
+                std::string ln = "";
+                if(form.has("first_name"))  fn = form.get("first_name");
+                if(form.has("last_name"))  ln = form.get("last_name");
 
-                std::string fn = form.get("first_name");
-                std::string ln = form.get("last_name");
                 auto results = database::User::search(fn, ln);
+                if(!results.empty())
+                {
+                    Poco::JSON::Array arr;
+                    for (auto s : results)
+                        arr.add(remove_password(s.toJSON()));
+                    response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                    response.setChunkedTransferEncoding(true);
+                    response.setContentType("application/json");
+                    std::ostream &ostr = response.send();
+                    Poco::JSON::Stringifier::stringify(arr, ostr);
+
+                    return;
+                }
+                else
+                {
+                    notFoundError(response, request.getURI(), "Users not found");
+                    return;
+                }
+                
+            }
+            else if (hasSubstr(request.getURI(), "/all_users"))
+            {
+
+                auto results = database::User::read_all();
                 if(!results.empty())
                 {
                     Poco::JSON::Array arr;
@@ -283,11 +312,12 @@ public:
                     {
                         if(user.save_to_mysql())
                         {
+                            user.save_to_cache();
                             response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
                             response.setChunkedTransferEncoding(true);
                             response.setContentType("application/json");
                             Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-                            root->set("inserted", user.get_id());
+                            root->set("inserted_id", user.get_id());
                             std::ostream &ostr = response.send();
                             Poco::JSON::Stringifier::stringify(root, ostr);
                             
@@ -309,8 +339,9 @@ public:
                 }
             }
         }
-        catch (...)
+        catch (const Poco::Exception& e)
         {
+            std::cout<<e.displayText()<<std::endl;
         }
 
         notFoundError(response, request.getURI(), "Request ot found");
