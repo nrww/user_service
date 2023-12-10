@@ -72,6 +72,7 @@
         "source_location": "cpp",
         "iomanip": "cpp",
         "typeindex": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "unordered_set": "cpp"
     }
 }

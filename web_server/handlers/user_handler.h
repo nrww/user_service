@@ -310,25 +310,19 @@ public:
 
                     if (check_result)
                     {
-                        if(user.save_to_mysql())
-                        {
-                            user.save_to_cache();
-                            response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-                            response.setChunkedTransferEncoding(true);
-                            response.setContentType("application/json");
-                            Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-                            root->set("inserted_id", user.get_id());
-                            std::ostream &ostr = response.send();
-                            Poco::JSON::Stringifier::stringify(root, ostr);
-                            
-                            return;
-                        }
-                        else
-                        {
-                            notFoundError(response, request.getURI(), "User not saved");
 
-                            return;
-                        }
+                        user.send_to_queue();
+                        user.save_to_cache();
+                        response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+                        response.setChunkedTransferEncoding(true);
+                        response.setContentType("application/json");
+                        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+                        root->set("inserted_id", user.get_id());
+                        std::ostream &ostr = response.send();
+                        Poco::JSON::Stringifier::stringify(root, ostr);
+                        
+                        return;
+
                         
                     }
                     else

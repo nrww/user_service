@@ -12,6 +12,7 @@ set (CMAKE_CXX_FLAGS_RELEASE "-O3 -g0 -std=${STD_CXX} -Wall -DNDEBUG ${REDISCPP_
 find_package(OpenSSL)
 find_package(Threads)
 find_package(ZLIB)
+find_package(CppKafka REQUIRED)
 find_package(Poco REQUIRED COMPONENTS Foundation Util Net XML JSON Crypto NetSSL)
 
 
@@ -44,7 +45,9 @@ target_link_libraries(${EXAMPLE_BINARY} PRIVATE
                              ${Poco_LIBRARIES}
                              "PocoData"
                              "PocoDataMySQL"
+                             "rdkafka++"
                              "mysqlclient"
+                             CppKafka::cppkafka
                              ZLIB::ZLIB)
 
 
