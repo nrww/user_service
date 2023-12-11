@@ -19,11 +19,13 @@ namespace database
             std::string _password;
             static inline long _last_id;
 
+            static const long &get_last_id();
+
+
         public:
 
             static User fromJSON(const std::string & str);
 
-            static const long &get_last_id();
 
             const long        &get_id() const;
             const std::string &get_first_name() const;
